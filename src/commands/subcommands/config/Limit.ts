@@ -15,7 +15,7 @@ export default class LimitSubCommand extends SubCommand {
                     name: "commands.limit.command.options.0.name",
                     description: "commands.limit.command.options.0.description",
                     minValue: 5,
-                    maxValue: new Date().getFullYear()
+                    maxValue: 10000
                 }
             ]
         );

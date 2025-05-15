@@ -30,6 +30,8 @@ export default class GenerateCommand extends Command {
         let generatedText = database.markovChains.generateChain(size);
         if (generatedText?.length > 2000) generatedText = generatedText.slice(0, 2000 - 3) + "...";
 
+        console.log(generatedText)
+
         if (generatedText && textsLength > 0 && generatedText.trim().length > 0) {
             return await interaction.reply(generatedText);
         } else {

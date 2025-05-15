@@ -44,6 +44,8 @@ export default class CommandHandler {
                 } else {
                     devCommandOptions.push(cmd);
                 }
+
+                console.log("[Commands]", `Loaded the command "${props.name}"`);
             } catch(e) {
                 console.error("[Commands]", `Failed to load the command "${v}":\n`, e);
             }

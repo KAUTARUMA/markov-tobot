@@ -250,7 +250,10 @@ export default class DeleteTextsCommand extends Command {
         const options: MessageSelectOption[] = [];
 
         items.forEach((v) => {
-            const label = v.decrypted.slice(0, 100);
+            let label = (v.decrypted || "").trim().replace(/\s+/g, " ");
+            if (label.length === 0) label = "(empty)";
+            if (label.length > 100) label = label.slice(0, 97) + "...";
+
             if (label.length < 0 || options.findIndex((opt) => opt.value == v.id) != -1) return;
 
             const addedAt = new Date(SnowflakeUtil.timestampFrom(v.id));

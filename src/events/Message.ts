@@ -42,10 +42,7 @@ export default class MessageCreate extends Event {
             let sendPercentage = await database.getSendingPercentage();
             let collectPercentage = await database.getCollectionPercentage();
 
-            console.log("got message ", message.content)
-
             if (Math.random() <= collectPercentage) {
-                 console.log("collected message ", message.content)
                 client.database.isTrackAllowed(message.author.id)
                     .then(async () => await database.addText(message.content, message.author.id, message.id))
                     .catch(() => {});
