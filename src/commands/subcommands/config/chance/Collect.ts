@@ -16,7 +16,7 @@ export default class CollectSubCommand extends SubCommand {
                     description: "commands.collectChance.command.options.0.description",
                     required: true,
                     minValue: 1,
-                    maxValue: 50
+                    maxValue: 100
                 }
             ]
         );
@@ -26,7 +26,7 @@ export default class CollectSubCommand extends SubCommand {
         const lng = { lng: interaction.locale };
 
         let chance = interaction.options.getInteger(this.options[0].name);
-        if (!chance || chance > 50 || chance < 1) return;
+        if (!chance || chance > 100 || chance < 1) return;
 
         const database = await this.client.database.fetch(interaction.guildId);
 

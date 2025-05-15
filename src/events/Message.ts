@@ -30,30 +30,34 @@ export default class MessageCreate extends Event {
         }
 
         const channelId = await database.getChannel();
+        const bannedChannels = ["1361370424943841540", "1361371171236352171", "1361435863963406467"]
         const webhook = await database.getWebhook();
         const clientMember = await message.guild.members.fetchMe();
         const messagePermission = clientMember.permissionsIn(channel)?.has("SEND_MESSAGES");
 
-        if (channel && message.channelId == channelId && messagePermission) {
+        if (messagePermission && !bannedChannels.includes(message.channelId)) {
             const hasMention = message.mentions.has(client.user);
             const textsLength = await database.getTextsLength();
             let guildCooldown = client.cooldown.get(message.guildId) ?? 0;
             let sendPercentage = await database.getSendingPercentage();
             let collectPercentage = await database.getCollectionPercentage();
 
+            console.log("got message ", message.content)
+
             if (Math.random() <= collectPercentage) {
+                 console.log("collected message ", message.content)
                 client.database.isTrackAllowed(message.author.id)
                     .then(async () => await database.addText(message.content, message.author.id, message.id))
                     .catch(() => {});
             }
 
             if (textsLength < 5) return;
-            if (hasMention && guildCooldown + 1000 < Date.now()) {
+            if (guildCooldown + 1000 < Date.now()) {
                 sendPercentage = await database.getReplyPercentage();
                 guildCooldown = 0;
             }
 
-            if (Math.random() <= sendPercentage && guildCooldown + 15000 < Date.now()) {      
+            if (hasMention || (Math.random() <= sendPercentage && guildCooldown + 15000 < Date.now())) {      
                 client.cooldown.set(message.guildId, Date.now());
                 
                 if (Math.random() <= 0.05) {

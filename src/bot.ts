@@ -23,7 +23,8 @@ export default new class Bot {
         failIfNotExists: false,
         intents: [
             Intents.FLAGS.GUILDS,
-            Intents.FLAGS.GUILD_MESSAGES
+            Intents.FLAGS.GUILD_MESSAGES,
+            Intents.FLAGS.MESSAGE_CONTENT
         ],
         sweepers: {
             users: this.sweeper,
