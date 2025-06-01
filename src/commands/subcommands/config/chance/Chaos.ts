@@ -11,7 +11,7 @@ export default class ChaosSubCommand extends SubCommand {
             "Changes how chaotic Joshua is",
             [
                 {
-                    type: "NUMBER",
+                    type: "INTEGER",
                     name: "chaos",
                     description: "the amount hes chaois control #dominions",
                     required: true,
