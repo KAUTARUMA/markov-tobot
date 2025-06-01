@@ -12,8 +12,8 @@ export default class ChaosSubCommand extends SubCommand {
             [
                 {
                     type: "NUMBER",
-                    name: "chance",
-                    description: "",
+                    name: "chaos",
+                    description: "the amount hes chaois control #dominions",
                     required: true,
                     minValue: 1,
                     maxValue: 100
