@@ -105,7 +105,8 @@ export default class InfoCommand extends Command {
             serverInfo += this.t("commands.info.texts.textsLimit", { ...lng, limit: await database.getTextsLimit() }) + "\n";
             serverInfo += this.t("commands.info.texts.collectChance", { ...lng, chance: `${await database.getCollectionPercentage() * 100}%` }) + "\n";
             serverInfo += this.t("commands.info.texts.sendingChance", { ...lng, chance: `${await database.getSendingPercentage() * 100}%` }) + "\n";
-            serverInfo += this.t("commands.info.texts.replyChance", { ...lng, chance: `${await database.getReplyPercentage() * 100}%` });
+            serverInfo += this.t("commands.info.texts.replyChance", { ...lng, chance: `${await database.getReplyPercentage() * 100}%` }) + "\n";
+            serverInfo += `Chaos: ${await database.getReplyPercentage() * 100}\n`;
         }
 
         // Software
