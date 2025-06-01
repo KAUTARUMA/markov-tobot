@@ -27,6 +27,7 @@ export default class GuildDatabase extends EventEmitter implements GuildDatabase
     public textsLimit: number = 500;
     public texts: DecryptedText[] = [];
     public collectPercentage: number;
+    public chaosPercentage: number;
     public sendingPercentage: number;
     public replyPercentage: number;
 
@@ -389,6 +390,21 @@ export default class GuildDatabase extends EventEmitter implements GuildDatabase
         try {
             await ConfigModel.findOneAndUpdate({ guildId: this.guildId }, { collectPercentage: percentage }, { upsert: true, new: true }).exec();
             this.collectPercentage = percentage;
+        } catch(e) {
+            console.error("[Database]", `Failed to set the collection percentage of guild ${this.guildId}:\n`, e);
+
+            throw e;
+        }
+    }
+
+    /**
+     * Defines the chance to collect messages.
+     * @param percentage Float percentage (`p / 100`).
+     */
+    async setChaosPercentage(percentage: number): Promise<void> {
+        try {
+            await ConfigModel.findOneAndUpdate({ guildId: this.guildId }, { chaosPercentage: percentage }, { upsert: true, new: true }).exec();
+            this.chaosPercentage = percentage;
         } catch(e) {
             console.error("[Database]", `Failed to set the collection percentage of guild ${this.guildId}:\n`, e);
 

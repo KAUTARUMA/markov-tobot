@@ -23,11 +23,12 @@ export default class GenerateCommand extends Command {
 
     async run(interaction: CommandInteraction) {
         const database = await this.client.database.fetch(interaction.guildId);
+        let chaosPercentage = await database.getChaosPercentage();
 
         const size = interaction.options.getInteger(this.options[0].name) ?? Math.floor(Math.random() * 50);
         const textsLength = await database.getTextsLength();
 
-        let generatedText = database.markovChains.generateChain(size);
+        let generatedText = database.markovChains.generateChain(size, chaosPercentage);
         if (generatedText?.length > 2000) generatedText = generatedText.slice(0, 2000 - 3) + "...";
 
         if (generatedText && textsLength > 0 && generatedText.trim().length > 0) {

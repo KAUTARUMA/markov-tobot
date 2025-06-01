@@ -29,26 +29,45 @@ export default class MarkovChains {
      * @param max Maximum words in the sentence.
      * @returns Generated sentence.
      */
-    generateChain(max: number): string {
-        let wordArray = Array.from(this.wordList.keys());
-        if (wordArray.length < 1) return;
+    generateChain(max: number, chaos: number = 0.5): string {
+        const wordArray = Array.from(this.wordList.keys());
+        if (wordArray.length < 1) return "";
 
-        let lastWord: string;
+        let lastWord: string | undefined;
         let generatedWords: string[] = [];
+
         while (!lastWord) {
-            lastWord = this.wordList.get(wordArray[Math.floor(Math.random() * wordArray.length)]).original;
+            const entry = this.wordList.get(wordArray[Math.floor(Math.random() * wordArray.length)]);
+            if (entry) lastWord = entry.original;
         }
-        
+
         generatedWords.push(lastWord);
 
-        for (let i=0; i < max - 1; i++) {
+        for (let i = 0; i < max - 1; i++) {
             if (!lastWord) break;
 
-            const nextWord = this.wordList.get(this.parseKey(lastWord));
-            if (!nextWord) break;
-            lastWord = nextWord.list[Math.floor(Math.random() * nextWord.list.length)];
+            if (Math.random() < chaos * 0.2) {
+                const randomEntry = this.wordList.get(wordArray[Math.floor(Math.random() * wordArray.length)]);
+                if (randomEntry) {
+                    lastWord = randomEntry.original;
+                    generatedWords.push(lastWord);
+                    continue;
+                }
+            }
 
+            const next = this.wordList.get(this.parseKey(lastWord));
+            if (!next || next.list.length === 0) break;
+
+            let nextIndex = Math.floor(
+                Math.pow(Math.random(), 1 - chaos) * next.list.length
+            );
+
+            lastWord = next.list[nextIndex];
             generatedWords.push(lastWord);
+            
+            if (Math.random() < chaos * 0.1) {
+                generatedWords.push(lastWord);
+            }
         }
 
         return this.filterGeneratedText(generatedWords.join(" "));

@@ -1,0 +1,41 @@
+import SubCommand from "../../../../structures/SubCommand";
+
+import { CommandInteraction } from "discord.js/typings";
+import ClientInterface from "../../../../interfaces/ClientInterface";
+
+export default class ChaosSubCommand extends SubCommand {
+    constructor(client: ClientInterface) {
+        super(
+            client,
+            "chaos",
+            "Changes how chaotic Joshua is",
+            [
+                {
+                    type: "NUMBER",
+                    name: "chance",
+                    description: "",
+                    required: true,
+                    minValue: 1,
+                    maxValue: 100
+                }
+            ]
+        );
+    }
+
+    async run(interaction: CommandInteraction) {
+        const lng = { lng: interaction.locale };
+
+        let chance = interaction.options.getInteger(this.options[0].name);
+        if (!chance || chance > 100 || chance < 1) return;
+
+        const database = await this.client.database.fetch(interaction.guildId);
+
+        try {
+            await database.setCollectionPercentage(chance / 100);
+
+            return interaction.reply("im too lazy to write a reply for tihs but it works trust me");
+        } catch(e) {
+            return interaction.reply({ content: this.t("vars.error", lng), ephemeral: true });
+        }
+    }
+}

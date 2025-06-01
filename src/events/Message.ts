@@ -41,6 +41,7 @@ export default class MessageCreate extends Event {
             let guildCooldown = client.cooldown.get(message.guildId) ?? 0;
             let sendPercentage = await database.getSendingPercentage();
             let collectPercentage = await database.getCollectionPercentage();
+            let chaosPercentage = await database.getChaosPercentage();
 
             if (Math.random() <= collectPercentage) {
                 client.database.isTrackAllowed(message.author.id)
@@ -66,7 +67,7 @@ export default class MessageCreate extends Event {
                     } catch {};
                 }
 
-                let generatedText = database.markovChains.generateChain(Math.floor(Math.random() * 50));
+                let generatedText = database.markovChains.generateChain(Math.floor(Math.random() * 50), chaosPercentage);
                 if (generatedText && generatedText.trim().length > 0) {
                     let timeout = Math.floor(5 + Math.random() * 5) * 1000;
 

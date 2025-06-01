@@ -8,6 +8,7 @@ interface ConfigModel {
     textsLimit: number;
 
     collectPercentage: number;
+    chaosPercentage: number;
     sendingPercentage: number;
     replyPercentage: number;
 };
