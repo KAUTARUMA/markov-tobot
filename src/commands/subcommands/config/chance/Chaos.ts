@@ -31,7 +31,7 @@ export default class ChaosSubCommand extends SubCommand {
         const database = await this.client.database.fetch(interaction.guildId);
 
         try {
-            await database.setCollectionPercentage(chance / 100);
+            await database.setChaosPercentage(chance / 100);
 
             return interaction.reply("im too lazy to write a reply for tihs but it works trust me");
         } catch(e) {
