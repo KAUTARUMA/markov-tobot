@@ -467,6 +467,31 @@ export default class GuildDatabase extends EventEmitter implements GuildDatabase
     }
 
     /**
+     * Gets the chance to collect messages.
+     * @returns Float percentage (`p / 100`);
+     */
+    async getChaosPercentage(): Promise<number> {
+        try {
+            if (!this.chaosPercentage) {
+                let percentage = 0.25;
+                let query = await ConfigModel.findOne({ guildId: this.guildId }, "chaosPercentage").exec();
+                if (query?.chaosPercentage) {
+                    percentage = query.chaosPercentage;
+                    this.chaosPercentage = percentage;
+                }
+
+                return percentage;
+            } else {
+                return this.chaosPercentage;
+            }
+        } catch(e) {
+            console.error("[Database]", `Failed to get the collection percentage of guild ${this.guildId}:\n`, e);
+
+            return 0.25;
+        }
+    }
+
+    /**
      * Gets the chance to send messages.
      * @returns Float percentage (`p / 100`);
      */
