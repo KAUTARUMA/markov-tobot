@@ -94,10 +94,7 @@ export default class ScanAsyncCommand extends Command {
             const options: { limit: number; before?: string } = { limit: 100 };
             if (lastId) options.before = lastId;
 
-            // Update status every 5 batches to avoid rate limiting
-            if (batchCount % 5 === 0) {
-                await interaction.editReply(`Scanning ${channel.name}... (Batch ${batchCount + 1})`);
-            }
+            await interaction.editReply(`Scanning ${channel.name}... (Batch ${batchCount + 1})`);
 
             if (batchCount > 4) {
                 break;

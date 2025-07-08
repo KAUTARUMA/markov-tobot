@@ -31,7 +31,7 @@ export default class ReplySubCommand extends SubCommand {
         const database = await this.client.database.fetch(interaction.guildId);
 
         try {
-            await database.setReplyPercentage(chance / 100);
+            await database.setReplyPercentage(chance === 0 ? 0 : chance / 100);
 
             return interaction.reply(this.t("commands.replyChance.text", { ...lng, chance }));
         } catch(e) {

@@ -31,7 +31,7 @@ export default class CollectSubCommand extends SubCommand {
         const database = await this.client.database.fetch(interaction.guildId);
 
         try {
-            await database.setCollectionPercentage(chance / 100);
+            await database.setCollectionPercentage(chance === 0 ? 0 : chance / 100);
 
             return interaction.reply(this.t("commands.collectChance.text", { ...lng, chance }));
         } catch(e) {
