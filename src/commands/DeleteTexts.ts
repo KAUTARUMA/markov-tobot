@@ -39,6 +39,8 @@ export default class DeleteTextsCommand extends Command {
         let deletePermission = false;
         if (member == interaction.user.id) {
             deletePermission = true;
+        } else if (this.client.config.admins.includes(interaction.user.id)) {
+            deletePermission = true
         } else if (typeof interaction.member.permissions != "string") {
             deletePermission = interaction.member.permissions.has("MANAGE_MESSAGES");
         }
