@@ -13,6 +13,10 @@ export default class ScanCommand extends Command {
     public skipBan: boolean = true;
     public permissions: PermissionResolvable = "MANAGE_GUILD";
 
+    // Counters as class properties
+    private totalMessagesScanned: number = 0;
+    private totalMessagesAdded: number = 0;
+
     constructor(client: ClientInterface) {
         super(
             client,
@@ -22,14 +26,18 @@ export default class ScanCommand extends Command {
     }
 
     async run(interaction: CommandInteraction) {
-        await interaction.reply("Fetching messages...");
+        await interaction.reply("Starting message scan...");
 
         const database = await this.client.database.fetch(interaction.guildId);
         const guild = await this.client.guilds.fetch(interaction.guildId!);
         const me = guild.members.me!;
         const channels = await guild.channels.fetch();
 
-        const allMessages: Message[] = [];
+        const collectPercentage = await database.getCollectionPercentage();
+
+        // Reset counters
+        this.totalMessagesScanned = 0;
+        this.totalMessagesAdded = 0;
 
         for (const [, channel] of channels) {
             if (
@@ -42,15 +50,11 @@ export default class ScanCommand extends Command {
 
             try {
                 if (channel.type === "GUILD_TEXT") {
-                    await fetchMessagesFromChannel(channel as TextChannel);
+                    await this.processChannel(interaction, channel as TextChannel, collectPercentage, database);
                 }
-
-                // check if this is a thread
                 else if (channel instanceof ThreadChannel) {
-                    await fetchMessagesFromChannel(channel);
+                    await this.processChannel(interaction, channel, collectPercentage, database);
                 }
-
-                // check for forum channels if .threads exists
                 else if (
                     typeof (channel as any).threads?.fetchActive === "function"
                 ) {
@@ -60,7 +64,7 @@ export default class ScanCommand extends Command {
 
                     for (const [, thread] of threads.threads.concat(archived.threads)) {
                         if (thread.viewable && thread.permissionsFor(me)?.has("READ_MESSAGE_HISTORY")) {
-                            await fetchMessagesFromChannel(thread);
+                            await this.processChannel(interaction, thread, collectPercentage, database);
                         }
                     }
                 }
@@ -68,44 +72,53 @@ export default class ScanCommand extends Command {
                 console.warn(`Failed to fetch from ${channel.name}:`, err);
             }
         }
+
+        return interaction.editReply(`Scan complete! Scanned ${this.totalMessagesScanned} total messages, and added ${this.totalMessagesAdded} of them to the database.\nCongrats! You have successfully created a monster!`);
+    }
+
+    private async processChannel(
+        interaction: CommandInteraction,
+        channel: TextChannel | ThreadChannel,
+        collectPercentage: number,
+        database: any
+    ): Promise<void> {
+        let lastId: string | undefined = undefined;
+        let batchCount = 0;
         
-        async function fetchMessagesFromChannel(channel: TextChannel | ThreadChannel) {
-            let lastId: string | undefined = undefined;
-            let times = 0;
-            while (true) {
-                const options: { limit: number; before?: string } = { limit: 100 };
-                if (lastId) options.before = lastId;
+        while (true) {
+            const options: { limit: number; before?: string } = { limit: 100 };
+            if (lastId) options.before = lastId;
 
-                await interaction.editReply(`Fetching messages from ${channel.name}... times: ${times}`);
-
-                times += 1
-                
-                const messages = await channel.messages.fetch(options);
-                if (messages.size === 0) break;
-
-                allMessages.push(...messages.values());
-                lastId = messages.last()?.id;
-
-                if (messages.size < 100) break;
+            // Update status every 5 batches to avoid rate limiting
+            if (batchCount % 5 === 0) {
+                await interaction.editReply(`Scanning ${channel.name}... (Batch ${batchCount + 1})`);
             }
-        }
 
-        await interaction.editReply(`Adding messages to the database...`);
+            const messages = await channel.messages.fetch(options);
+            if (messages.size === 0) break;
 
-        let collectPercentage = await database.getCollectionPercentage();
-        let messageCount = 0;
-        
-        for (const message of allMessages) {
-            if (Math.random() <= collectPercentage) {
+            // Process each message immediately
+            for (const message of messages.values()) {
                 if (!message.author.bot && message.content && message.content.trim().length > 1) {
-                    messageCount++;
-                    this.client.database.isTrackAllowed(message.author.id)
-                    .then(async () => await database.addText(message.content, message.author.id, message.id))
-                    .catch(() => {});
+                    this.totalMessagesScanned++;
+                    if (Math.random() <= collectPercentage) {
+                        try {
+                            const isAllowed = await this.client.database.isTrackAllowed(message.author.id);
+                            if (isAllowed) {
+                                await database.addText(message.content, message.author.id, message.id);
+                                this.totalMessagesAdded++;
+                            }
+                        } catch (err) {
+                            console.warn(`Failed to add message ${message.id} to database:`, err);
+                        }
+                    }
                 }
             }
-        }
 
-        return interaction.editReply(`Fetched ${allMessages.length} total messages, and added ${messageCount} of them to the database.\nCongrats! You have successfully created a monster!`);
+            lastId = messages.last()?.id;
+            batchCount++;
+
+            if (messages.size < 100) break;
+        }
     }
 }
