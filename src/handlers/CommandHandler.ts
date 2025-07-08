@@ -33,7 +33,7 @@ export default class CommandHandler {
                     nameLocalizations: props.nameLocalizations,
                     descriptionLocalizations: props.descriptionLocalizations,
                     dmPermission: !!props.allowedDm,
-                    defaultMemberPermissions: props.permissions ?? null,
+                    defaultMemberPermissions: null,
                     options: props.options
                 };
                 

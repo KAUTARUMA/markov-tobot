@@ -40,7 +40,7 @@ export default new class Bot {
         const { client } = this;
         
         client.config = {
-            admins: [ "283740954328825858" ],
+            admins: [ "1171524613751197816" ],
             devGuilds: [],
             links: {
                 website: "https://knwbot.gitbook.io/markov-bot/",

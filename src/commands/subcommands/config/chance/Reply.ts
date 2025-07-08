@@ -15,7 +15,7 @@ export default class ReplySubCommand extends SubCommand {
                     name: "commands.replyChance.command.options.0.name",
                     description: "commands.replyChance.command.options.0.description",
                     required: true,
-                    minValue: 1,
+                    minValue: 0,
                     maxValue: 100
                 }
             ]
@@ -26,7 +26,7 @@ export default class ReplySubCommand extends SubCommand {
         const lng = { lng: interaction.locale };
 
         let chance = interaction.options.getInteger(this.options[0].name);
-        if (!chance || chance > 100 || chance < 1) return;
+        if (!chance || chance > 100 || chance < 0) return;
 
         const database = await this.client.database.fetch(interaction.guildId);
 
