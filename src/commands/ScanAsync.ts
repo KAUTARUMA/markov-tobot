@@ -99,6 +99,10 @@ export default class ScanAsyncCommand extends Command {
                 await interaction.editReply(`Scanning ${channel.name}... (Batch ${batchCount + 1})`);
             }
 
+            if (batchCount > 4) {
+                break;
+            }
+
             const messages = await channel.messages.fetch(options);
             if (messages.size === 0) break;
 
@@ -106,7 +110,7 @@ export default class ScanAsyncCommand extends Command {
             for (const message of messages.values()) {
                 if (!message.author.bot && message.content && message.content.trim().length > 1) {
                     this.totalMessagesScanned++;
-                    if (Math.random() <= collectPercentage || true) {
+                    //if (Math.random() <= collectPercentage) {
                         try {
                             const isAllowed = await this.client.database.isTrackAllowed(message.author.id);
                             if (isAllowed) {
@@ -116,7 +120,7 @@ export default class ScanAsyncCommand extends Command {
                         } catch (err) {
                             console.warn(`Failed to add message ${message.id} to database:`, err);
                         }
-                    }
+                    //}
                 }
             }
 
