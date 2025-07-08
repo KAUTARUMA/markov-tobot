@@ -26,7 +26,7 @@ export default class CollectSubCommand extends SubCommand {
         const lng = { lng: interaction.locale };
 
         let chance = interaction.options.getInteger(this.options[0].name);
-        if (!chance || chance > 100 || chance < 0) return;
+        if (chance > 100 || chance < 0) return;
 
         const database = await this.client.database.fetch(interaction.guildId);
 
