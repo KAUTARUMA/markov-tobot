@@ -30,7 +30,15 @@ export default class MessageCreate extends Event {
         }
 
         const channelId = await database.getChannel();
-        const bannedChannels = ["1361370424943841540", "1361371171236352171", "1361435863963406467"] // WILL CHANGE TO BE NOT HARDCODED LATER
+        const bannedChannels = [
+            "1361370424943841540", 
+            "1361371171236352171", 
+            "1361435863963406467",
+            "810581626307739739",
+            "761708931193372752",
+            "717313998181105704",
+            "868998231512719431"
+        ] // WILL CHANGE TO BE NOT HARDCODED LATER
         const webhook = await database.getWebhook();
         const clientMember = await message.guild.members.fetchMe();
         const messagePermission = clientMember.permissionsIn(channel)?.has("SEND_MESSAGES");

@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import ClientInterface from "../interfaces/ClientInterface";
 
-export default class ScanCommand extends Command {
+export default class ScanAsyncCommand extends Command {
     public skipBan: boolean = true;
     public permissions: PermissionResolvable = "MANAGE_GUILD";
 
@@ -39,6 +39,21 @@ export default class ScanCommand extends Command {
         this.totalMessagesScanned = 0;
         this.totalMessagesAdded = 0;
 
+        const bannedChannels = [
+            "1361370424943841540", 
+            "1361371171236352171", 
+            "1361435863963406467",
+            "810581626307739739",
+            "761708931193372752",
+            "717313998181105704",
+            "868998231512719431"
+        ]
+
+        const onlyChannels = [
+            "1325244548368040069",
+            "1336455219734773760"
+        ]
+
         for (const [, channel] of channels) {
             if (
                 !("type" in channel) ||
@@ -50,23 +65,13 @@ export default class ScanCommand extends Command {
 
             try {
                 if (channel.type === "GUILD_TEXT") {
-                    await this.processChannel(interaction, channel as TextChannel, collectPercentage, database);
-                }
-                else if (channel instanceof ThreadChannel) {
-                    await this.processChannel(interaction, channel, collectPercentage, database);
-                }
-                else if (
-                    typeof (channel as any).threads?.fetchActive === "function"
-                ) {
-                    const forum = channel as any;
-                    const threads = await forum.threads.fetchActive();
-                    const archived = await forum.threads.fetchArchived();
-
-                    for (const [, thread] of threads.threads.concat(archived.threads)) {
-                        if (thread.viewable && thread.permissionsFor(me)?.has("READ_MESSAGE_HISTORY")) {
-                            await this.processChannel(interaction, thread, collectPercentage, database);
-                        }
+                    if (bannedChannels.includes(channel.id)) {
+                        continue;
                     }
+
+                    //if (onlyChannels.includes(channel.id)) {
+                        await this.processChannel(interaction, channel as TextChannel, collectPercentage, database);
+                    //}
                 }
             } catch (err) {
                 console.warn(`Failed to fetch from ${channel.name}:`, err);
@@ -101,7 +106,7 @@ export default class ScanCommand extends Command {
             for (const message of messages.values()) {
                 if (!message.author.bot && message.content && message.content.trim().length > 1) {
                     this.totalMessagesScanned++;
-                    if (Math.random() <= collectPercentage) {
+                    if (Math.random() <= collectPercentage || true) {
                         try {
                             const isAllowed = await this.client.database.isTrackAllowed(message.author.id);
                             if (isAllowed) {
