@@ -58,10 +58,10 @@ export default class MessageCreate extends Event {
             }
 
             if (textsLength < 5) return;
-            if (guildCooldown + 1000 < Date.now()) {
+            /*if (guildCooldown + 1000 < Date.now()) {
                 sendPercentage = await database.getReplyPercentage();
                 guildCooldown = 0;
-            }
+            }*/
 
             if (hasMention || (Math.random() <= sendPercentage && guildCooldown + 15000 < Date.now())) {      
                 client.cooldown.set(message.guildId, Date.now());
