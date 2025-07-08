@@ -34,7 +34,11 @@ export default class Interaction extends Event {
         if (interaction.isCommand()) {
             const command: CommandInterface = client.commands.get(interaction.commandName);
             if (command) {
-                if ((command.permissions && !interaction.memberPermissions.has(command.permissions)) || client.config.admins.includes(interaction.user.id)) {
+                if (
+                    command.permissions &&
+                    !interaction.memberPermissions.has(command.permissions) &&
+                    !client.config.admins.includes(interaction.user.id)
+                ) {
                     return interaction.reply({ content: t("commands.config.error", { lng: interaction.locale }), ephemeral: true });
                 }
 
